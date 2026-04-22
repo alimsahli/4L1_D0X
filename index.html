@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ali Msahli | Windows XP Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Tahoma:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --xp-blue: #245edb;
+            --xp-blue-dark: #0c3c9c;
+            --xp-blue-mid: #2f69df;
+            --xp-sky: #7ec7ff;
+            --xp-border: #08398b;
+            --xp-taskbar: #1f56d9;
+            --xp-taskbar-dark: #123d9a;
+            --xp-green: #3cab3c;
+            --xp-window: #ece9d8;
+            --xp-shadow: rgba(0, 0, 0, 0.35);
+            --cmd-bg: #000000;
+            --cmd-text: #d7d7d7;
+            --cmd-white: #f2f2f2;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: Tahoma, sans-serif;
+            background:
+                linear-gradient(rgba(255,255,255,0.03), rgba(255,255,255,0.03)),
+                url('./public/xp-assets/wallpapers/Bliss.png') center center / cover no-repeat fixed;
+            color: #111;
+            cursor: url('./public/xp-assets/cursors/default_arrow.png') 2 2, auto;
+        }
+
+        button, a, .start-item, .task-btn, .file-row, .window-controls button {
+            cursor: url('./public/xp-assets/cursors/default_link.png') 2 2, pointer;
+        }
+
+        .boot-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: #000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .boot-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .boot-logo {
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            font-weight: bold;
+            letter-spacing: -0.04em;
+        }
+
+        .boot-logo span:first-child { color: #f35325; }
+        .boot-logo span:nth-child(2) { color: #81bc06; }
+        .boot-logo span:nth-child(3) { color: #05a6f0; }
+        .boot-logo span:nth-child(4) { color: #ffba08; }
+
+        .boot-subtitle {
+            font-size: 1.05rem;
+            color: #d6e3ff;
+        }
+
+        .boot-bar {
+            width: min(360px, 80vw);
+            height: 18px;
+            border: 2px solid #5e5e5e;
+            background: #101010;
+            padding: 2px;
+            overflow: hidden;
+        }
+
+        .boot-progress {
+            height: 100%;
+            width: 40%;
+            background: linear-gradient(90deg, #0d3ea9, #68b9ff, #0d3ea9);
+            animation: bootMove 1.05s linear infinite;
+        }
+
+        @keyframes bootMove {
+            0% { transform: translateX(-120%); }
+            100% { transform: translateX(320%); }
+        }
+
+        .desktop {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .hill {
+            display: none;
+        }
+
+        .hill.left { left: -8vw; transform: rotate(-7deg); }
+        .hill.right { right: -14vw; bottom: 42px; width: 58vw; height: 28vh; transform: rotate(8deg); }
+
+        .desktop-icons {
+            position: absolute;
+            top: 24px;
+            left: 18px;
+            display: grid;
+            gap: 18px;
+            z-index: 3;
+        }
+
+        .icon {
+            width: 88px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            cursor: url('./public/xp-assets/cursors/default_link.png') 2 2, pointer;
+            user-select: none;
+        }
+
+        .icon:active { transform: translateY(1px); }
+
+        .icon-art {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 4px 10px rgba(0,0,0,0.2);
+            font-size: 26px;
+            position: relative;
+        }
+
+        .icon-paint {
+            background: linear-gradient(135deg, #ffffff, #e7efff);
+            color: #245edb;
+        }
+
+        .icon-folder {
+            background: linear-gradient(180deg, #ffd86f, #f0b631);
+            color: #7b4f00;
+        }
+
+        .icon-terminal {
+            background: linear-gradient(180deg, #2a2a2a, #0a0a0a);
+            color: #f4f4f4;
+            border: 2px solid #93b7ff;
+        }
+
+        .icon-browser {
+            background: linear-gradient(180deg, #f4f8ff, #c5d9ff);
+            color: #1e4ea7;
+        }
+
+        .icon-danger {
+            background: linear-gradient(180deg, #fff4a8, #ffcb47);
+            color: #7a3000;
+        }
+
+        .icon-label {
+            font-size: 12px;
+            line-height: 1.15;
+            background: rgba(14, 57, 126, 0.25);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .window,
+        .xp-paint-window,
+        .xp-explorer-window {
+            position: absolute;
+            border: 1px solid #0a2f7a;
+            border-radius: 9px 9px 0 0;
+            box-shadow: 0 20px 40px var(--xp-shadow);
+            overflow: hidden;
+            min-width: 280px;
+            min-height: 180px;
+            background: var(--xp-window);
+        }
+
+        .window {
+            top: 10vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(980px, calc(100vw - 60px));
+            height: min(720px, calc(100vh - 110px));
+            background: var(--xp-window);
+            z-index: 5;
+            display: none;
+        }
+
+        .window.visible,
+        .xp-paint-window.visible,
+        .xp-explorer-window.visible,
+        .start-menu.visible {
+            display: block;
+        }
+
+        .titlebar {
+            height: 31px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 40%),
+                linear-gradient(180deg, #2d7cf7 0%, #1958d1 45%, #0e43ad 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px 0 10px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: url('./public/xp-assets/cursors/default_move.png') 8 8, move;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .titlebar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .window-controls button {
+            width: 22px;
+            height: 22px;
+            border: 1px solid rgba(0,0,0,0.35);
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(180deg, #7db6ff, #2d66d0);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+        }
+
+        .window-controls button:last-child {
+            background: linear-gradient(180deg, #ff9d90, #db3d2f);
+        }
+
+        .window-content {
+            height: calc(100% - 31px);
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 28%),
+                linear-gradient(180deg, #f7f3e8 0%, #ece9d8 100%);
+            display: grid;
+            grid-template-columns: 220px 1fr;
+        }
+
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 16px;
+            height: 16px;
+            cursor: url('./public/xp-assets/cursors/default_size4.png') 8 8, nwse-resize;
+            background: linear-gradient(135deg, transparent 0 45%, rgba(255,255,255,0.75) 46% 54%, transparent 55%),
+                        linear-gradient(135deg, transparent 0 65%, rgba(0,0,0,0.25) 66% 74%, transparent 75%);
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #d8e6ff 0%, #bad3ff 12%, #8bb4ff 100%);
+            padding: 16px 12px;
+            border-right: 1px solid #8ba9db;
+        }
+
+        .sidebar-panel {
+            background: rgba(255,255,255,0.78);
+            border: 1px solid #7da2df;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        .sidebar h3 {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: #0e3e99;
+        }
+
+        .sidebar p, .sidebar li {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.45;
+            color: #11315f;
+        }
+
+        .sidebar ul {
+            padding-left: 16px;
+            margin: 8px 0 0;
+        }
+
+        .terminal-wrap {
+            background: #d4d0c8;
+            margin: 12px;
+            border: 1px solid #7b7b7b;
+            overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.32);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .terminal-toolbar {
+            background: linear-gradient(180deg, #f5f5f5, #d7d7d7);
+            color: #111;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-bottom: 1px solid #868686;
+            font-family: Tahoma, sans-serif;
+        }
+
+        .cmd-surface {
+            display: flex;
+            flex-direction: column;
+            background: var(--cmd-bg);
+            border: 2px inset #808080;
+            margin: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #terminal {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--cmd-text);
+            font-size: 15px;
+            scrollbar-width: thin;
+            background: #000;
+        }
+
+        .prompt-color { color: var(--cmd-white); }
+        .user-color { color: var(--cmd-white); }
+        .command-color { color: var(--cmd-white); }
+        .output-color { color: var(--cmd-text); }
+        .link-color { color: #8cc3ff; text-decoration: underline; }
+        .error-color { color: #ff8a8a; }
+        .success-color { color: var(--cmd-white); }
+
+        #input-line {
+            display: flex;
+            align-items: center;
+            background: #000;
+            border-top: 1px solid #2a2a2a;
+            padding: 10px 12px;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        #input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--cmd-white);
+            flex-grow: 1;
+            padding-left: 0.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 15px;
+            cursor: url('./public/xp-assets/cursors/default_ibeam.png') 8 8, text;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0;
+            border-right: 0.7em solid var(--cmd-white);
+            height: 1.1em;
+            margin-left: -0.35em;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { border-right-color: transparent; }
+            50% { border-right-color: var(--cmd-white); }
+        }
+
+        .xp-paint-window {
+            top: 15vh;
+            left: 14vw;
+            width: 300px;
+            background: var(--xp-window);
+            z-index: 4;
+            display: none;
+        }
+
+        .paint-toolbar {
+            padding: 6px 8px;
+            font-size: 12px;
+            border-bottom: 1px solid #b1b1b1;
+            background: linear-gradient(180deg, #fbfbfb, #e5e5e5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .paint-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .paint-toolbar button,
+        .paint-toolbar select {
+            font-size: 12px;
+        }
+
+        .paint-body {
+            padding: 10px;
+            background: #d4d0c8;
+        }
+
+        .paint-canvas-wrap {
+            border: 1px solid #7f9db9;
+            background: white;
+            padding: 0;
+        }
+
+        #paint-canvas {
+            display: block;
+            background: white;
+            width: 100%;
+            height: 220px;
+            cursor: crosshair;
+        }
+
+        .xp-explorer-window {
+            top: 18vh;
+            right: 6vw;
+            width: 390px;
+            background: var(--xp-window);
+            z-index: 4;
+            display: none;
+        }
+
+        .browser-window {
+            top: 9vh;
+            left: 12vw;
+            width: min(980px, calc(100vw - 80px));
+            height: min(720px, calc(100vh - 120px));
+            background: var(--xp-window);
+            z-index: 4;
+            display: none;
+        }
+
+        .browser-toolbar {
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #204079;
+            border-bottom: 1px solid #b1b1b1;
+            background: linear-gradient(180deg, #fbfbfb, #e6edf9);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .browser-nav {
+            display: flex;
+            gap: 6px;
+        }
+
+        .nav-btn {
+            border: 1px solid #8aa7db;
+            background: linear-gradient(180deg, #ffffff, #dfeafc);
+            padding: 3px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .browser-frame-wrap {
+            height: calc(100% - 63px);
+            background: white;
+        }
+
+        .video-frame-wrap {
+            height: calc(100% - 31px);
+            background: #000;
+        }
+
+        .video-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+
+        .browser-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .explorer-toolbar {
+            padding: 6px 10px;
+            font-size: 12px;
+            color: #204079;
+            border-bottom: 1px solid #b1b1b1;
+            background: linear-gradient(180deg, #fbfbfb, #e6edf9);
+        }
+
+        .address-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            font-size: 12px;
+            background: linear-gradient(180deg, #fdfefe, #edf3fd);
+            border-bottom: 1px solid #c2d4f2;
+        }
+
+        .address-pill {
+            flex: 1;
+            padding: 5px 8px;
+            background: #fff;
+            border: 1px solid #94b2e3;
+            color: #23437c;
+        }
+
+        .explorer-body {
+            padding: 0;
+            background: linear-gradient(180deg, #f8fbff, #eef4ff);
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            min-height: 360px;
+        }
+
+        .explorer-sidebar {
+            padding: 12px 10px;
+            border-right: 1px solid #c2d4f2;
+            background: linear-gradient(180deg, #dcecff, #c8defd 45%, #b5d0fb 100%);
+        }
+
+        .explorer-group {
+            margin-bottom: 14px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid #9dbcf0;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .explorer-group h4 {
+            margin: 0 0 8px;
+            font-size: 12px;
+            color: #18418d;
+        }
+
+        .explorer-group button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            font-size: 12px;
+            color: #23437c;
+            cursor: pointer;
+        }
+
+        .explorer-main {
+            padding: 12px;
+        }
+
+        .explorer-note {
+            font-size: 12px;
+            color: #2b4a7f;
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            display: grid;
+            gap: 8px;
+            font-size: 13px;
+            color: #18376a;
+        }
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid #c6d7f5;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.92);
+            cursor: pointer;
+        }
+
+        .file-row:hover {
+            background: #dce9ff;
+            border-color: #7aa2df;
+        }
+
+        .file-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-action {
+            font-size: 11px;
+            color: #4166a5;
+        }
+
+        .taskbar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 40px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 28%),
+                linear-gradient(180deg, #2f69df 0%, #1d4fbf 45%, #143b95 100%);
+            border-top: 1px solid #7bb1ff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px 0 4px;
+            z-index: 8;
+        }
+
+        .start-btn {
+            height: 32px;
+            min-width: 96px;
+            border: none;
+            border-radius: 999px;
+            color: white;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 18px;
+            padding: 0 18px 0 16px;
+            background: linear-gradient(180deg, #59c34e 0%, #2f9e31 60%, #267c28 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 2px 2px 0 rgba(0,0,0,0.2);
+            margin-right: 4px;
+        }
+
+        .start-menu {
+            position: absolute;
+            left: 2px;
+            bottom: 40px;
+            width: min(386px, calc(100vw - 6px));
+            height: 446px;
+            z-index: 15;
+            display: none;
+            border: 1px solid #0a2f7a;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            box-shadow: 0 18px 42px rgba(0,0,0,0.35);
+            background: #fff;
+        }
+
+        .start-header {
+            height: 58px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            background: linear-gradient(180deg, #4d8efc 0%, #245edb 55%, #0d3ea9 100%);
+        }
+
+        .start-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            background: linear-gradient(180deg, #ffdb91, #ffb11b);
+            color: #5e3900;
+            border: 2px solid rgba(255,255,255,0.75);
+        }
+
+        .start-body {
+            display: grid;
+            grid-template-columns: 1fr 138px;
+            height: calc(100% - 58px - 42px);
+        }
+
+        .start-left {
+            background: #ffffff;
+            padding: 10px 8px;
+        }
+
+        .start-right {
+            background: linear-gradient(180deg, #d6e7ff, #b7d2ff);
+            padding: 10px 8px;
+            border-left: 1px solid #9ab9ee;
+        }
+
+        .start-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 8px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-family: Tahoma, sans-serif;
+            font-size: 13px;
+        }
+
+        .start-item:hover {
+            background: #2f69df;
+            color: white;
+        }
+
+        .start-item strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .start-item span {
+            font-size: 11px;
+            opacity: 0.85;
+        }
+
+        .start-footer {
+            height: 42px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 10px;
+            background: linear-gradient(180deg, #2c68dc, #1b4cae);
+            border-top: 1px solid rgba(255,255,255,0.22);
+        }
+
+        .shutdown-btn {
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            padding: 7px 12px;
+            cursor: pointer;
+            background: linear-gradient(180deg, #e66d3c, #cb3e16);
+        }
+
+        .task-buttons {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-btn {
+            height: 26px;
+            min-width: 154px;
+            max-width: 210px;
+            border: 1px solid rgba(255,255,255,0.24);
+            border-radius: 3px;
+            color: white;
+            background: linear-gradient(180deg, rgba(171,205,255,0.8), rgba(43,91,185,0.95));
+            padding: 0 10px;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: none;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+            font-size: 12px;
+        }
+
+        .task-btn.visible { display: block; }
+
+        .system-tray {
+            height: 30px;
+            min-width: 104px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            color: white;
+            font-size: 12px;
+            background: linear-gradient(180deg, #7dc0ff, #2773d6);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+            margin-left: 4px;
+        }
+
+        .minesweeper-window {
+            top: 12vh;
+            left: 22vw;
+            width: 320px;
+            height: 420px;
+            background: var(--xp-window);
+            z-index: 4;
+            display: none;
+        }
+
+        .minesweeper-body {
+            height: calc(100% - 31px);
+            background: #c0c0c0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .minesweeper-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px inset #fff;
+            background: #c0c0c0;
+            padding: 8px;
+        }
+
+        .mine-counter,
+        .mine-timer {
+            background: #000;
+            color: #ff2b2b;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 22px;
+            padding: 2px 8px;
+            min-width: 64px;
+            text-align: center;
+            border: 2px inset #7a7a7a;
+        }
+
+        .mine-face {
+            width: 34px;
+            height: 34px;
+            border: 2px outset #fff;
+            background: #c0c0c0;
+            font-size: 18px;
+        }
+
+        .minesweeper-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0;
+            border: 3px inset #fff;
+            background: #7b7b7b;
+            padding: 4px;
+            flex: 1;
+        }
+
+        .mine-cell {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 2px outset #fff;
+            background: #c0c0c0;
+            display: grid;
+            place-items: center;
+            font-family: Tahoma, sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        .mine-cell.revealed {
+            border: 1px solid #8a8a8a;
+            background: #d4d0c8;
+        }
+
+        .mine-cell.flagged { color: #d10f19; }
+        .mine-cell.mine { background: #f3b1b1; }
+        .mine-cell.n1 { color: #0000ff; }
+        .mine-cell.n2 { color: #008200; }
+        .mine-cell.n3 { color: #ff0000; }
+        .mine-cell.n4 { color: #000084; }
+        .mine-cell.n5 { color: #840000; }
+        .mine-cell.n6 { color: #008284; }
+        .mine-cell.n7 { color: #000000; }
+        .mine-cell.n8 { color: #7b7b7b; }
+
+        .ascii-art {
+            font-size: 0.68rem;
+            line-height: 1;
+            white-space: pre;
+            color: var(--cmd-white);
+        }
+
+        .mobile-banner { display: none; }
+
+        @media (max-width: 860px) {
+            .explorer-body {
+                grid-template-columns: 1fr;
+            }
+
+            .explorer-sidebar {
+                display: none;
+            }
+            .window {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 70px);
+                top: 8px;
+            }
+
+            .window-content,
+            .start-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar,
+            .start-right { display: none; }
+
+            .xp-explorer-window,
+            .xp-paint-window {
+                width: calc(100vw - 40px);
+                left: 10px;
+                right: 10px;
+            }
+
+            .desktop-icons {
+                grid-template-columns: repeat(3, 88px);
+                gap: 14px;
+            }
+
+            .start-menu {
+                height: 420px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .ascii-art { display: none; }
+            .mobile-banner { display: block !important; }
+            .icon { width: 78px; }
+            .start-btn { min-width: 78px; font-size: 16px; padding: 0 12px; }
+            .system-tray { min-width: 88px; }
+            .file-row { align-items: flex-start; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="boot-screen" id="boot-screen">
+        <img src="./public/xp-assets/logo/WindowsLogo-small.png" alt="Windows logo" style="width: 72px; height: auto; image-rendering: pixelated;" />
+        <div class="boot-logo"><span>w</span><span>i</span><span>n</span><span>dows</span> xp</div>
+        <div class="boot-subtitle">Starting Ali Msahli Portfolio...</div>
+        <div class="boot-bar"><div class="boot-progress"></div></div>
+    </div>
+
+    <div class="desktop" id="desktop">
+        <div class="hill left"></div>
+        <div class="hill right"></div>
+
+        <div class="desktop-icons">
+            <div class="icon" data-open="terminal-window">
+                <div class="icon-art icon-terminal">&gt;_</div>
+                <div class="icon-label">Terminal</div>
+            </div>
+            <div class="icon" data-open="explorer-window">
+                <div class="icon-art icon-folder">📁</div>
+                <div class="icon-label">My Projects</div>
+            </div>
+            <div class="icon" data-open="paint-window">
+                <div class="icon-art icon-paint">🖌️</div>
+                <div class="icon-label">Paint</div>
+            </div>
+            <div class="icon" data-open="browser-window">
+                <div class="icon-art icon-browser">🌐</div>
+                <div class="icon-label">Internet</div>
+            </div>
+            <div class="icon" data-open="minesweeper-window">
+                <div class="icon-art icon-danger">💣</div>
+                <div class="icon-label">Minesweeper</div>
+            </div>
+            <div class="icon" data-video="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                <div class="icon-art icon-danger">🎁</div>
+                <div class="icon-label">don't click</div>
+            </div>
+        </div>
+
+        <section class="window visible" id="terminal-window">
+            <div class="titlebar" data-drag-handle>
+                <div class="titlebar-left">
+                    <span>🖥️</span>
+                    <span>Command Prompt</span>
+                </div>
+                <div class="window-controls">
+                    <button type="button" title="Minimize" data-minimize="terminal-window">_</button>
+                    <button type="button" title="Maximize">□</button>
+                    <button type="button" title="Close" data-close="terminal-window">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <aside class="sidebar">
+                    <div class="sidebar-panel">
+                        <h3>System Tasks</h3>
+                        <p>Windows XP inspired portfolio shell.</p>
+                        <ul>
+                            <li>Retro desktop landing page</li>
+                            <li>Interactive portfolio terminal</li>
+                            <li>Explorer shortcuts to real sections</li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-panel">
+                        <h3>Quick Launch</h3>
+                        <ul>
+                            <li>help</li>
+                            <li>about</li>
+                            <li>projects</li>
+                            <li>skills</li>
+                            <li>contact</li>
+                            <li>social</li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-panel">
+                        <h3>Profile</h3>
+                        <p>Ali Msahli</p>
+                        <p>Network Infrastructure and Data Security Engineering student at ESPRIT</p>
+                        <p>Interested in DFIR, malware analysis, pentesting, and SOC workflows</p>
+                    </div>
+                </aside>
+                <div class="terminal-wrap">
+                    <div class="terminal-toolbar">C:\WINDOWS\system32\cmd.exe</div>
+                    <div class="cmd-surface">
+                        <div id="terminal" onclick="document.getElementById('input').focus();">
+                            <div id="output"></div>
+                        </div>
+                        <div id="input-line">
+                            <span class="prompt-color">C:\Documents and Settings\Ali&gt;</span>
+                            <input type="text" id="input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <span class="cursor"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="xp-explorer-window" id="explorer-window">
+            <div class="titlebar" data-drag-handle>
+                <div class="titlebar-left"><span>📁</span><span>My Portfolio</span></div>
+                <div class="window-controls">
+                    <button type="button" data-minimize="explorer-window">_</button>
+                    <button type="button">□</button>
+                    <button type="button" data-close="explorer-window">✕</button>
+                </div>
+            </div>
+            <div class="explorer-toolbar">File  Edit  View  Favorites  Tools  Help</div>
+            <div class="address-bar">
+                <span>Address</span>
+                <div class="address-pill">Ali Portfolio\Sections</div>
+            </div>
+            <div class="explorer-body">
+                <aside class="explorer-sidebar">
+                    <div class="explorer-group">
+                        <h4>File and Folder Tasks</h4>
+                        <button type="button" data-command="about">Open profile</button>
+                        <button type="button" data-command="projects">Open projects</button>
+                        <button type="button" data-command="contact">Open contact</button>
+                    </div>
+                    <div class="explorer-group">
+                        <h4>Other Places</h4>
+                        <button type="button" data-open="browser-window">Internet</button>
+                        <button type="button" data-open="paint-window">Paint</button>
+                    </div>
+                </aside>
+                <div class="explorer-main">
+                <div class="explorer-note">Click any row to open Terminal and jump to the matching section.</div>
+                <div class="file-list" id="file-list">
+                    <button class="file-row" type="button" data-command="about">
+                        <span class="file-meta"><span>📄</span><span>About Ali</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="skills">
+                        <span class="file-meta"><span>📄</span><span>Technical Skills</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="projects">
+                        <span class="file-meta"><span>📄</span><span>Projects</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="experience">
+                        <span class="file-meta"><span>📄</span><span>Experience</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="certs">
+                        <span class="file-meta"><span>📄</span><span>Certifications</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="education">
+                        <span class="file-meta"><span>📄</span><span>Education</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="contact">
+                        <span class="file-meta"><span>📄</span><span>Contact</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                    <button class="file-row" type="button" data-command="social">
+                        <span class="file-meta"><span>📄</span><span>Social Links</span></span>
+                        <span class="file-action">Open</span>
+                    </button>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="xp-paint-window" id="paint-window">
+            <div class="titlebar" data-drag-handle>
+                <div class="titlebar-left"><span>🎨</span><span>Paint</span></div>
+                <div class="window-controls">
+                    <button type="button" data-minimize="paint-window">_</button>
+                    <button type="button">□</button>
+                    <button type="button" data-close="paint-window">✕</button>
+                </div>
+            </div>
+            <div class="paint-toolbar">
+                <span>File  Edit  View  Image  Colors  Help</span>
+                <div class="paint-controls">
+                    <label for="paint-color">Color</label>
+                    <input id="paint-color" type="color" value="#245edb">
+                    <button type="button" id="paint-clear">Clear</button>
+                </div>
+            </div>
+            <div class="paint-body">
+                <div class="paint-canvas-wrap">
+                    <canvas id="paint-canvas" width="278" height="220"></canvas>
+                </div>
+            </div>
+            <div class="resize-handle"></div>
+        </section>
+
+        <section class="xp-explorer-window browser-window" id="browser-window">
+            <div class="titlebar" data-drag-handle>
+                <div class="titlebar-left"><span>🌐</span><span>Internet Explorer</span></div>
+                <div class="window-controls">
+                    <button type="button" data-minimize="browser-window">_</button>
+                    <button type="button">□</button>
+                    <button type="button" data-close="browser-window">✕</button>
+                </div>
+            </div>
+            <div class="browser-toolbar">
+                <div class="browser-nav">
+                    <button class="nav-btn" type="button" id="browser-back">Back</button>
+                    <button class="nav-btn" type="button" id="browser-home">Home</button>
+                </div>
+                <div class="address-pill">https://alimsahli.github.io/</div>
+            </div>
+            <div class="browser-frame-wrap">
+                <iframe class="browser-frame" id="browser-frame" src="https://alimsahli.github.io/" title="Ali Msahli website"></iframe>
+            </div>
+            <div class="resize-handle"></div>
+        </section>
+
+        <section class="xp-explorer-window minesweeper-window" id="minesweeper-window">
+            <div class="titlebar" data-drag-handle>
+                <div class="titlebar-left"><span>💣</span><span>Minesweeper</span></div>
+                <div class="window-controls">
+                    <button type="button" data-minimize="minesweeper-window">_</button>
+                    <button type="button" data-maximize="minesweeper-window">□</button>
+                    <button type="button" data-close="minesweeper-window">✕</button>
+                </div>
+            </div>
+            <div class="minesweeper-body">
+                <div class="minesweeper-top">
+                    <div class="mine-counter" id="mine-counter">010</div>
+                    <button class="mine-face" id="mine-reset" type="button">🙂</button>
+                    <div class="mine-timer" id="mine-timer">000</div>
+                </div>
+                <div class="minesweeper-grid" id="minesweeper-grid"></div>
+            </div>
+            <div class="resize-handle"></div>
+        </section>
+
+        <section class="start-menu" id="start-menu">
+            <div class="start-header">
+                <div class="start-avatar">A</div>
+                <div>
+                    <strong>Ali Msahli</strong><br>
+                    <span>Cybersecurity Portfolio</span>
+                </div>
+            </div>
+            <div class="start-body">
+                <div class="start-left">
+                    <button class="start-item" type="button" data-open="terminal-window">
+                        <div>🖥️</div>
+                        <div><strong>Command Prompt</strong><span>Open the interactive portfolio terminal</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-open="explorer-window">
+                        <div>📁</div>
+                        <div><strong>My Portfolio</strong><span>Browse portfolio sections and shortcuts</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-open="paint-window">
+                        <div>🎨</div>
+                        <div><strong>Paint</strong><span>Sketch directly on the desktop app</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-open="browser-window">
+                        <div>🌐</div>
+                        <div><strong>Internet Explorer</strong><span>Browse your live website inside the desktop</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-open="minesweeper-window">
+                        <div>💣</div>
+                        <div><strong>Minesweeper</strong><span>Classic game, high stakes, tiny squares</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-command="about">
+                        <div>👤</div>
+                        <div><strong>About Ali</strong><span>Jump to the profile section in terminal</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-command="projects">
+                        <div>🗂️</div>
+                        <div><strong>Projects</strong><span>Open investigations and work summary</span></div>
+                    </button>
+                    <button class="start-item" type="button" data-command="contact">
+                        <div>📨</div>
+                        <div><strong>Contact</strong><span>Show contact details</span></div>
+                    </button>
+                </div>
+                <div class="start-right">
+                    <button class="start-item" type="button" data-command="skills">🛠️ Skills</button>
+                    <button class="start-item" type="button" data-command="experience">💼 Experience</button>
+                    <button class="start-item" type="button" data-command="certs">🏅 Certifications</button>
+                    <button class="start-item" type="button" data-command="education">🎓 Education</button>
+                    <button class="start-item" type="button" data-command="social">🌐 Social</button>
+                    <button class="start-item" type="button" data-open="browser-window">🧭 Browser</button>
+                    <button class="start-item" type="button" data-open="minesweeper-window">💣 Minesweeper</button>
+                </div>
+            </div>
+            <div class="start-footer">
+                <button class="shutdown-btn" type="button" id="shutdown-btn">Turn Off Computer</button>
+            </div>
+        </section>
+
+        <footer class="taskbar">
+            <button class="start-btn" type="button" id="start-btn">start</button>
+            <div class="task-buttons">
+                <button class="task-btn visible" id="task-terminal" data-open="terminal-window">Command Prompt</button>
+                <button class="task-btn" id="task-explorer" data-open="explorer-window">My Portfolio</button>
+                <button class="task-btn" id="task-paint" data-open="paint-window">Paint</button>
+                <button class="task-btn" id="task-browser" data-open="browser-window">Internet Explorer</button>
+                <button class="task-btn" id="task-minesweeper" data-open="minesweeper-window">Minesweeper</button>
+            </div>
+            <div class="system-tray">
+                <span>🔊 📶</span>
+                <span id="clock">12:00 AM</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const terminal = document.getElementById('terminal');
+        const startBtn = document.getElementById('start-btn');
+        const startMenu = document.getElementById('start-menu');
+        const bootScreen = document.getElementById('boot-screen');
+        const shutdownBtn = document.getElementById('shutdown-btn');
+        let commandHistory = [];
+        let historyIndex = -1;
+
+        const commands = {
+            help: `
+                <span class="success-color">Microsoft Windows XP [Version 5.1.2600]</span><br>
+                <span class="success-color">(C) Copyright 1985-2001 Microsoft Corp.</span><br><br>
+                <span class="command-color">help</span>          Displays this help message<br>
+                <span class="command-color">about</span>         Displays information about me<br>
+                <span class="command-color">skills</span>        Lists my technical skills<br>
+                <span class="command-color">projects</span>      Shows my academic projects<br>
+                <span class="command-color">experience</span>    Details my professional experience<br>
+                <span class="command-color">certs</span>         Lists my certifications<br>
+                <span class="command-color">education</span>     Shows my education background<br>
+                <span class="command-color">contact</span>       Displays my contact information<br>
+                <span class="command-color">social</span>        Shows my social media links<br>
+                <span class="command-color">banner</span>        Displays the welcome banner<br>
+                <span class="command-color">clear</span>         Clears the screen
+            `,
+            about: `
+                <span class="success-color">Loading profile...</span><br><br>
+                I am a Network Infrastructure and Data Security Engineering student at ESPRIT with a strong interest in digital forensics, malware analysis, network security, penetration testing, and SOC workflows.<br><br>
+                Through academic projects, internships, and hands-on labs, I have worked on secure network design, SIEM and SOAR oriented environments, identity and access management, and practical offensive and defensive security tooling.<br><br>
+                I actively build writeups and investigation notes around CTFs, traffic analysis, and incident response style exercises, with the goal of turning technical findings into clear, useful reporting.
+            `,
+            skills: `
+                <span class="success-color">Accessing skillset...</span><br><br>
+                <span class="prompt-color">Core Competencies:</span> Penetration Testing, Network Security, Malware Analysis, Digital Forensics<br>
+                <span class="prompt-color">Tools:</span> Metasploit, Nmap, Wireshark, Nessus, ZAP, SQLmap, BurpSuite, CyberChef<br>
+                <span class="prompt-color">Languages & Frameworks:</span> JavaScript, PHP, C++, JAVA, SQL, Python, Symfony<br>
+                <span class="prompt-color">Development Tools:</span> Visual Studio Code, Git, QT Creator, IntelliJ IDEA
+            `,
+            projects: `
+                <span class="success-color">Loading project data...</span><br><br>
+                <span class="prompt-color">1. Security Operations Center (SOC) for Healthcare:</span><br>
+                Designed a comprehensive SOC tailored for a healthcare environment, focusing on real-time threat monitoring and automated incident response.<br>
+                - Key Components: Secure VLANs, SIEM/SOAR (Wazuh, TheHive), AI-driven Threat Intel, HIPAA & ISO 27001 compliance.<br><br>
+                <span class="prompt-color">2. On-Premises Identity and Access Management (IAM):</span><br>
+                Implemented a secure on-premises IAM solution using Active Directory, focusing on best practices for hardening and security.<br>
+                - Key Components: Secure AD config, hardening policies, vulnerability assessments with PingCastle.
+            `,
+            experience: `
+                <span class="success-color">Decompiling work history...</span><br><br>
+                <span class="prompt-color">1. Cybersecurity Engineering Intern</span><br>
+                <span class="output-color">IMEDRA SPHERE | Aug 2025 - Sep 2025 | Tunis, Tunisia (Remote)</span><br>
+                - Architected and developed a malware analysis sandbox with Python (Flask) and VirtualBox.<br>
+                - Automated execution, screenshots, and artifact collection with PowerShell and Sysmon.<br>
+                - Configured a hardened Windows 10 golden image with custom Sysmon rules.<br>
+                - Integrated Flask with VBoxManage to automate VM lifecycle operations.<br><br>
+                <span class="prompt-color">2. Back-End Software Engineering Intern</span><br>
+                <span class="output-color">Esprit DSI Group | Jul 2024 - Aug 2024</span><br><br>
+                <span class="prompt-color">3. Frontend Developer Intern</span><br>
+                <span class="output-color">Comunik CRM | Jul 2022 - Sep 2022</span>
+            `,
+            certs: `
+                <span class="success-color">Verifying credentials...</span><br><br>
+                - Certified Red Team Analyst (CRTA), CyberWarFare Labs, Issued Aug 2025, Credential ID 68a8fbd27c217ee6bfc05c08<br>
+                - SOC Level 1, TryHackMe, Issued Sep 2025<br>
+                - AWS Academy Graduate, Cloud Security Foundations Training Badge, Issued Oct 2025<br>
+                - Advent of Cyber 2025 Certificate, TryHackMe, Issued Dec 2025<br>
+                - TryHackMe Jr Penetration Tester<br>
+                - TryHackMe Cyber Security 101<br>
+                - TheSecOps Group Certified AppSec Practitioner (CAP)<br>
+                - Cisco NetAcad CyberOps Associate<br>
+                - Cisco NetAcad Ethical Hacker<br>
+                - Cisco NetAcad Introduction to Cybersecurity
+            `,
+            education: `
+                <span class="success-color">Querying educational records...</span><br><br>
+                <span class="prompt-color">University of ESPRIT</span> (Sep 2021 - Present)<br>
+                Network Infrastructure and Data Security Engineering
+            `,
+            contact: `
+                <span class="success-color">Establishing secure channel...</span><br><br>
+                <span class="prompt-color">Email:</span> <a href="mailto:ali.msahli@esprit.tn" class="link-color">ali.msahli@esprit.tn</a><br>
+                <span class="prompt-color">Phone:</span> +216 29082229
+            `,
+            social: `
+                <span class="success-color">Pinging social networks...</span><br><br>
+                <span class="prompt-color">LinkedIn:</span> <a href="https://www.linkedin.com/in/ali-msahli-698a87220/" target="_blank" class="link-color">linkedin.com/in/ali-msahli-698a87220</a><br>
+                <span class="prompt-color">Website:</span> <a href="https://alimsahli.github.io/" target="_blank" class="link-color">alimsahli.github.io</a><br>
+                <span class="prompt-color">TryHackMe:</span> <a href="https://tryhackme.com/p/AL1D0cs" target="_blank" class="link-color">tryhackme.com/p/AL1D0cs</a><br>
+                <span class="prompt-color">GitHub:</span> <a href="https://github.com/alimsahli" target="_blank" class="link-color">github.com/alimsahli</a>
+            `,
+            banner: `
+<pre class="prompt-color ascii-art">
+Microsoft Windows XP [Version 5.1.2600]
+(C) Copyright 1985-2001 Microsoft Corp.
+
+  _______  ___      ___   _______  ___   _______  __   __  ___      ___   
+ |   _   ||   |    |   | |       ||   | |       ||  |_|  ||   |    |   |  
+ |  |_|  ||   |    |   | |  _____||   | |    ___||       ||   |    |   |  
+ |       ||   |    |   | | |_____ |   | |   |___ |       ||   |    |   |  
+ |       ||   |___ |   | |_____  ||   | |    ___||       ||   |___ |   |  
+ |   _   ||       ||   |  _____| ||   | |   |___ | ||_|| ||       ||   |  
+ |__| |__||_______||___| |_______||___| |_______||_|   |_||_______||___|  
+</pre>
+                <h1 class="mobile-banner text-2xl font-bold prompt-color">Ali Msahli</h1>
+                <span class="success-color">Welcome to the Command Prompt.</span><br>
+                Type '<span class="command-color">help</span>' for a list of available commands.
+            `,
+            clear: ''
+        };
+
+        const windows = {
+            'terminal-window': document.getElementById('terminal-window'),
+            'explorer-window': document.getElementById('explorer-window'),
+            'paint-window': document.getElementById('paint-window'),
+            'browser-window': document.getElementById('browser-window'),
+            'minesweeper-window': document.getElementById('minesweeper-window')
+        };
+
+        const taskButtons = {
+            'terminal-window': document.getElementById('task-terminal'),
+            'explorer-window': document.getElementById('task-explorer'),
+            'paint-window': document.getElementById('task-paint'),
+            'browser-window': document.getElementById('task-browser'),
+            'minesweeper-window': document.getElementById('task-minesweeper')
+        };
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function typeCommand(command) {
+            input.disabled = true;
+            input.value = '';
+            for (const char of command) {
+                input.value += char;
+                await sleep(28);
+            }
+            await sleep(180);
+            processCommand();
+            input.disabled = false;
+            input.focus();
+        }
+
+        function renderPrompt(command) {
+            return `<div><span class="prompt-color">C:\\Documents and Settings\\Ali&gt;</span><span class="command-color">${command}</span></div>`;
+        }
+
+        function processCommand(forcedCommand) {
+            const command = (forcedCommand ?? input.value).trim().toLowerCase();
+            if (command === '') return;
+
+            output.innerHTML += renderPrompt(command);
+
+            if (command !== commandHistory[commandHistory.length - 1]) {
+                commandHistory.push(command);
+            }
+            historyIndex = commandHistory.length;
+
+            if (command === 'clear') {
+                output.innerHTML = '';
+            } else if (commands[command]) {
+                output.innerHTML += `<div class="output-color">${commands[command]}</div><br>`;
+            } else {
+                output.innerHTML += `<div class="error-color">'${command}' is not recognized as an internal or external command, operable program or batch file.</div><br>`;
+            }
+
+            input.value = '';
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function openWindow(id) {
+            windows[id].classList.add('visible');
+            if (taskButtons[id]) taskButtons[id].classList.add('visible');
+            bringToFront(windows[id]);
+            if (id === 'terminal-window') input.focus();
+        }
+
+        function closeWindow(id) {
+            windows[id].classList.remove('visible');
+            if (id !== 'terminal-window' && taskButtons[id]) {
+                taskButtons[id].classList.remove('visible');
+            }
+        }
+
+        function minimizeWindow(id) {
+            windows[id].classList.remove('visible');
+        }
+
+        function bringToFront(win) {
+            const highest = [...document.querySelectorAll('.window, .xp-explorer-window, .xp-paint-window, .browser-window')]
+                .reduce((max, el) => Math.max(max, parseInt(window.getComputedStyle(el).zIndex) || 0), 0);
+            win.style.zIndex = highest + 1;
+        }
+
+        function runCommand(command) {
+            openWindow('terminal-window');
+            processCommand(command);
+            closeStartMenu();
+            input.focus();
+        }
+
+        function toggleStartMenu() {
+            startMenu.classList.toggle('visible');
+        }
+
+        function closeStartMenu() {
+            startMenu.classList.remove('visible');
+        }
+
+        document.querySelectorAll('[data-open]').forEach(el => {
+            el.addEventListener('click', () => {
+                openWindow(el.dataset.open);
+                closeStartMenu();
+            });
+        });
+
+        document.querySelectorAll('[data-video]').forEach(el => {
+            el.addEventListener('click', () => {
+                window.open(el.dataset.video, '_blank', 'noopener');
+                closeStartMenu();
+            });
+        });
+
+        document.querySelectorAll('[data-command]').forEach(el => {
+            el.addEventListener('click', () => runCommand(el.dataset.command));
+        });
+
+        document.querySelectorAll('[data-close]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeWindow(el.dataset.close);
+            });
+        });
+
+        document.querySelectorAll('[data-minimize]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                minimizeWindow(el.dataset.minimize);
+            });
+        });
+
+        document.querySelectorAll('[data-maximize]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMaximize(el.dataset.maximize);
+            });
+        });
+
+        document.querySelectorAll('.window, .xp-explorer-window, .xp-paint-window, .browser-window').forEach(win => {
+            win.addEventListener('mousedown', () => bringToFront(win));
+        });
+
+        startBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleStartMenu();
+        });
+
+        shutdownBtn.addEventListener('click', () => {
+            closeStartMenu();
+            bootScreen.classList.remove('hidden');
+            setTimeout(() => bootScreen.classList.add('hidden'), 1800);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!startMenu.contains(e.target) && e.target !== startBtn) {
+                closeStartMenu();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                processCommand();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                    input.setSelectionRange(input.value.length, input.value.length);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                    input.setSelectionRange(input.value.length, input.value.length);
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+            }
+        });
+
+        function initClock() {
+            const clock = document.getElementById('clock');
+            const update = () => {
+                clock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            };
+            update();
+            setInterval(update, 1000 * 30);
+        }
+
+        function toggleMaximize(id) {
+            const win = windows[id];
+            if (!win) return;
+
+            if (win.dataset.maximized === 'true') {
+                win.style.left = win.dataset.prevLeft || '';
+                win.style.top = win.dataset.prevTop || '';
+                win.style.width = win.dataset.prevWidth || '';
+                win.style.height = win.dataset.prevHeight || '';
+                win.style.transform = win.dataset.prevTransform || 'none';
+                win.dataset.maximized = 'false';
+            } else {
+                const rect = win.getBoundingClientRect();
+                win.dataset.prevLeft = win.style.left || rect.left + 'px';
+                win.dataset.prevTop = win.style.top || rect.top + 'px';
+                win.dataset.prevWidth = win.style.width || rect.width + 'px';
+                win.dataset.prevHeight = win.style.height || rect.height + 'px';
+                win.dataset.prevTransform = win.style.transform || 'none';
+                win.style.left = '0px';
+                win.style.top = '0px';
+                win.style.width = window.innerWidth + 'px';
+                win.style.height = (window.innerHeight - 44) + 'px';
+                win.style.transform = 'none';
+                win.dataset.maximized = 'true';
+            }
+            bringToFront(win);
+        }
+
+        function makeDraggable(win) {
+            const handle = win.querySelector('[data-drag-handle]');
+            const resizeHandle = win.querySelector('.resize-handle');
+            let isDragging = false;
+            let isResizing = false;
+            let offsetX = 0;
+            let offsetY = 0;
+            let startWidth = 0;
+            let startHeight = 0;
+            let startX = 0;
+            let startY = 0;
+
+            handle.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.window-controls')) return;
+                if (win.dataset.maximized === 'true') return;
+                isDragging = true;
+                bringToFront(win);
+                const rect = win.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                win.style.left = rect.left + 'px';
+                win.style.top = rect.top + 'px';
+                win.style.transform = 'none';
+                document.body.style.userSelect = 'none';
+            });
+
+            if (resizeHandle) {
+                resizeHandle.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    if (win.dataset.maximized === 'true') return;
+                    isResizing = true;
+                    bringToFront(win);
+                    startWidth = win.offsetWidth;
+                    startHeight = win.offsetHeight;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    const rect = win.getBoundingClientRect();
+                    win.style.left = rect.left + 'px';
+                    win.style.top = rect.top + 'px';
+                    win.style.transform = 'none';
+                    document.body.style.userSelect = 'none';
+                });
+            }
+
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const x = Math.max(0, Math.min(window.innerWidth - win.offsetWidth, e.clientX - offsetX));
+                    const y = Math.max(0, Math.min(window.innerHeight - 50 - win.offsetHeight, e.clientY - offsetY));
+                    win.style.left = x + 'px';
+                    win.style.top = y + 'px';
+                }
+
+                if (isResizing) {
+                    const maxWidth = window.innerWidth - win.offsetLeft;
+                    const maxHeight = window.innerHeight - 50 - win.offsetTop;
+                    const newWidth = Math.max(280, Math.min(maxWidth, startWidth + (e.clientX - startX)));
+                    const newHeight = Math.max(180, Math.min(maxHeight, startHeight + (e.clientY - startY)));
+                    win.style.width = newWidth + 'px';
+                    win.style.height = newHeight + 'px';
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                isResizing = false;
+                document.body.style.userSelect = '';
+            });
+        }
+
+        function initBrowser() {
+            const frame = document.getElementById('browser-frame');
+            document.getElementById('browser-home').addEventListener('click', () => {
+                frame.src = 'https://alimsahli.github.io/';
+            });
+            document.getElementById('browser-back').addEventListener('click', () => {
+                try {
+                    frame.contentWindow.history.back();
+                } catch {
+                    frame.src = 'https://alimsahli.github.io/';
+                }
+            });
+        }
+
+        function initMinesweeper() {
+            const gridEl = document.getElementById('minesweeper-grid');
+            const counterEl = document.getElementById('mine-counter');
+            const timerEl = document.getElementById('mine-timer');
+            const resetBtn = document.getElementById('mine-reset');
+            const width = 9;
+            const height = 9;
+            const mineCount = 10;
+            let board = [];
+            let revealed = 0;
+            let flags = 0;
+            let gameOver = false;
+            let timer = 0;
+            let timerId = null;
+
+            const neighbors = (x, y) => {
+                const out = [];
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (!dx && !dy) continue;
+                        const nx = x + dx;
+                        const ny = y + dy;
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) out.push([nx, ny]);
+                    }
+                }
+                return out;
+            };
+
+            const updateHud = () => {
+                counterEl.textContent = String(mineCount - flags).padStart(3, '0');
+                timerEl.textContent = String(timer).padStart(3, '0');
+            };
+
+            const startTimer = () => {
+                if (timerId) return;
+                timerId = setInterval(() => {
+                    timer = Math.min(999, timer + 1);
+                    updateHud();
+                }, 1000);
+            };
+
+            const stopTimer = () => {
+                clearInterval(timerId);
+                timerId = null;
+            };
+
+            const revealCell = (x, y) => {
+                const cell = board[y][x];
+                if (cell.revealed || cell.flagged || gameOver) return;
+                cell.revealed = true;
+                revealed++;
+                const el = cell.el;
+                el.classList.add('revealed');
+
+                if (cell.mine) {
+                    el.textContent = '💣';
+                    el.classList.add('mine');
+                    resetBtn.textContent = '😵';
+                    gameOver = true;
+                    stopTimer();
+                    board.flat().forEach(c => {
+                        if (c.mine && !c.revealed) {
+                            c.el.classList.add('revealed');
+                            c.el.textContent = '💣';
+                        }
+                    });
+                    return;
+                }
+
+                if (cell.count > 0) {
+                    el.textContent = cell.count;
+                    el.classList.add('n' + cell.count);
+                } else {
+                    neighbors(x, y).forEach(([nx, ny]) => revealCell(nx, ny));
+                }
+
+                if (revealed === width * height - mineCount) {
+                    gameOver = true;
+                    resetBtn.textContent = '😎';
+                    stopTimer();
+                }
+            };
+
+            const buildBoard = () => {
+                stopTimer();
+                timer = 0;
+                revealed = 0;
+                flags = 0;
+                gameOver = false;
+                resetBtn.textContent = '🙂';
+                gridEl.innerHTML = '';
+                board = Array.from({ length: height }, (_, y) => Array.from({ length: width }, (_, x) => ({
+                    x, y, mine: false, count: 0, revealed: false, flagged: false, el: null
+                })));
+
+                const positions = Array.from({ length: width * height }, (_, i) => i).sort(() => Math.random() - 0.5).slice(0, mineCount);
+                positions.forEach(pos => {
+                    const x = pos % width;
+                    const y = Math.floor(pos / width);
+                    board[y][x].mine = true;
+                });
+
+                board.forEach((row, y) => row.forEach((cell, x) => {
+                    if (!cell.mine) cell.count = neighbors(x, y).filter(([nx, ny]) => board[ny][nx].mine).length;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'mine-cell';
+                    btn.addEventListener('click', () => {
+                        if (gameOver) return;
+                        startTimer();
+                        revealCell(x, y);
+                    });
+                    btn.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        if (gameOver || cell.revealed) return;
+                        startTimer();
+                        cell.flagged = !cell.flagged;
+                        btn.textContent = cell.flagged ? '🚩' : '';
+                        btn.classList.toggle('flagged', cell.flagged);
+                        flags += cell.flagged ? 1 : -1;
+                        updateHud();
+                    });
+                    cell.el = btn;
+                    gridEl.appendChild(btn);
+                }));
+
+                updateHud();
+            };
+
+            resetBtn.addEventListener('click', buildBoard);
+            buildBoard();
+        }
+
+        function initPaint() {
+            const canvas = document.getElementById('paint-canvas');
+            const ctx = canvas.getContext('2d');
+            const colorPicker = document.getElementById('paint-color');
+            const clearBtn = document.getElementById('paint-clear');
+            let drawing = false;
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = colorPicker.value;
+
+            colorPicker.addEventListener('input', () => {
+                ctx.strokeStyle = colorPicker.value;
+            });
+
+            const getPos = (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+                const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+                return {
+                    x: (clientX - rect.left) * (canvas.width / rect.width),
+                    y: (clientY - rect.top) * (canvas.height / rect.height)
+                };
+            };
+
+            const start = (event) => {
+                drawing = true;
+                const pos = getPos(event);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            };
+
+            const move = (event) => {
+                if (!drawing) return;
+                event.preventDefault();
+                const pos = getPos(event);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            };
+
+            const stop = () => {
+                drawing = false;
+                ctx.beginPath();
+            };
+
+            canvas.addEventListener('mousedown', start);
+            canvas.addEventListener('mousemove', move);
+            canvas.addEventListener('mouseup', stop);
+            canvas.addEventListener('mouseleave', stop);
+            canvas.addEventListener('touchstart', start, { passive: true });
+            canvas.addEventListener('touchmove', move, { passive: false });
+            canvas.addEventListener('touchend', stop);
+
+            clearBtn.addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = colorPicker.value;
+            });
+        }
+
+        function init() {
+            output.innerHTML = `<div class="output-color">${commands.banner}</div><br>`;
+            initClock();
+            initBrowser();
+            initMinesweeper();
+            initPaint();
+            Object.values(windows).forEach(makeDraggable);
+            setTimeout(() => {
+                bootScreen.classList.add('hidden');
+            }, 1900);
+            setTimeout(() => typeCommand('about'), 2100);
+        }
+
+        init();
+    </script>
+</body>
+</html>
